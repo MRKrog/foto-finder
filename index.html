@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8'/>
+    <title>Foto Finder</title>
+    <meta name="author" content="Michael Krog Foto Finder">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="images/favicon.ico" />
+    <!-- FONTS -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,800" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" >
+    <!-- CSS STYLES -->
+    <link rel="stylesheet" type="text/css" media="screen" href="css/normalize.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/styles.css" />
+  </head><!-- /End Head -->
+  <body>
+    <main class="top_container">
+      <header class="header_container">
+        <nav class="nav--container">
+          <aside class="aside--nav_bar">
+            <h1 class="main_title">Foto<span class="inner--title_img"><img src="images/foto-finder-logo.svg" /></span>Finder</h1>
+          </aside>
+          <aside class="aside--nav_bar">
+            <fieldset class="search-bar">
+              <input type="text" class="searchTerm" placeholder="Search">
+              <button type="submit" class="searchButton">
+                <i class="fa fa-search"></i>
+              </button>
+            </fieldset>
+          </aside>
+        </nav>
+      </header><!-- /End Header -->
+      <article class="input_container">
+        <fieldset class="fieldset--container">
+          <form>
+            <label for="idea-title" class="label-spacing">Title</label>
+            <input type="text" name="title" class="title-input inputs">
+          </form>
+        </fieldset>
+        <fieldset class="fieldset--container">
+          <form>
+            <label for="idea-body" class="label-spacing">Caption</label>
+            <input type="text" name="caption" class="caption-input inputs">
+          </form>
+        </fieldset>
+        <label for="file-btn" class="field_btn choose-btn">Custom Upload</label>
+        <!-- <input type="file" name="file" id="file" class="inputfile" data-multiple-caption="{count} files selected" multiple /> -->
+        <input id="file-btn" name="file" accept="image/*,.pdf" type="file"/>
+        <section class="fieldset--buttons">
+          <button class="field_btn extra-btn" id="view-btn" type="submit">View <span>#</span> Favorite</button>
+          <button class="field_btn extra-btn" id="add-btn" type="submit">Add to Album</button>
+        </section>
+      </article>
+    </main><!-- /End Top Container -->
+    <main class="photo_container">
+      <article class="photo_feed">
+        <!-- <div class="photo_card">
+          <section class="card_photo_head card-space">
+            <h2>Waterfall Image</h2>
+          </section>
+          <section class="card_image_container">
+            <img class="card_image" src="images/boxImages/elephant.jpg" />
+          </section>
+          <section class="card_photo_copy card-space">
+            <p>There are many variations of passages of Lorem</p>
+          </section>
+          <section class="card_photo_footer card-space">
+            <img src="images/delete.svg" alt="delete" />
+            <img src="images/favorite.svg" alt="delete" />
+          </section>
+        </div> -->
+      </article>
+    </main><!-- /End Photo Container -->
+    <footer class="footer--container">
+      <button style="width:20%; margin:1em;" class="field_btn extra-btn" id="clear-btn" type="submit">Clear</button>
+    </footer><!-- /End Footer -->
+    <!-- JAVASCRIPT -->
+    <script type="text/javascript" src="js/photo.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+  </body><!-- /End Body -->
+</html><!-- /End HTML -->
