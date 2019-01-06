@@ -1,74 +1,136 @@
 // Global Variables
-var create = document.querySelector('#add-btn');
-
-// var input = document.querySelector('input');
-
+const create = document.querySelector('#add-btn');
 const titleInput = document.querySelector('.title-input');
 const captionInput = document.querySelector('.caption-input');
-var input = document.querySelector('#file-btn');
 
-// const fileBtn = document.querySelector('#file-btn');
+// var input = document.querySelector('#file-btn');
+
+const fileBtn = document.querySelector('#file-btn');
 const viewBtn = document.querySelector('#view-btn');
-// const addBtn = document.querySelector('#add-btn');
+const addBtn = document.querySelector('#add-btn');
 
 const photoGallery = document.querySelector('.photo_feed');
 
-var imagesArr = JSON.parse(localStorage.getItem('photos')) || [];
+const imagesArr = [];
+const favoriteArray = ['images/favorite.svg','images/favorite-active.svg']
+
 var reader = new FileReader();
 
 window.addEventListener('load', appendPhotos);
-create.addEventListener('click', createElement);
+create.addEventListener('click', getPhoto);
+photoGallery.addEventListener('click', photoClick);
 
 
 function appendPhotos() {
-  console.log('append photo');
-  console.log(imagesArr);
-
-  imagesArr.forEach(function(photo) {
-    console.log('in for each');
-    photoGallery.innerHTML += `<img src=${photo.file} />`
+  Object.keys(localStorage).forEach(function(photo) {
+    var item = JSON.parse(localStorage.getItem(photo));
+    let newPhoto = new Photo(item.id, item.title, item.caption, item.image);
+    imagesArr.push(newPhoto);
+    addPhoto(newPhoto);
   })
-
-  // Object.keys(localStorage).forEach(function(photo) {
-  //   console.log('in for each');
-  //   photoGallery.innerHTML += `<img src=${photo.file} />`
-  // })
-
 }
 
-function createElement() {
-  console.log('create element function');
-  // console.log(input.files[0]);
-  // if (input.files[0]) {
-    reader.readAsDataURL(input.files[0]);
-    reader.onload = addPhoto
-  // }
+function getPhoto(){
+  // console.log(fileBtn.files[0])
+  if (fileBtn.files[0]) {
+    reader.readAsDataURL(fileBtn.files[0]);
+    reader.onload = createElement
+  }
 }
 
-function addPhoto(e) {
-  console.log('addPhoto');
-  console.log(e.target.result);
-  var newPhoto = new Photo(Date.now(), titleInput.value, captionInput.vlaue, e.target.result);
-  photoGallery.innerHTML += `<div class="photo_card">
+function createElement(event) {
+  // var image = event.target.result;
+  // var title = titleInput.value;
+  // var caption = captionInput.value;
+  var newPhoto = new Photo(Date.now(), titleInput.value, captionInput.value, event.target.result);
+  imagesArr.push(newPhoto);
+  newPhoto.saveToStorage();
+  addPhoto(newPhoto);
+}
+
+function addPhoto(newPhoto) {
+  photoGallery.innerHTML += `<div class="photo_card" id="${newPhoto.id}">
     <section class="card_photo_head card-space">
-      <h2>${titleInput.value}</h2>
+      <h2>${newPhoto.title}</h2>
     </section>
     <section class="card_image_container">
-      <img class="card_image" src=${e.target.result} />
+      <img class="card_image" src="${newPhoto.image}" />
     </section>
     <section class="card_photo_copy card-space">
-      <p>${captionInput.value}</p>
+      <p>${newPhoto.caption}</p>
     </section>
     <section class="card_photo_footer card-space">
-      <img src="images/delete.svg" alt="delete" />
-      <img src="images/favorite.svg" alt="delete" />
+      <button><img src="images/delete.svg" data-id="${newPhoto.id}" alt="delete" class="deleteBtn" /></button>
+      <button><img src="${favoriteArray[newPhoto.favorite]}" data-id="${newPhoto.id}" alt="favorite" class="favoriteBtn" /></button>
     </section>
   </div>`;
-  imagesArr.push(newPhoto)
-  newPhoto.saveToStorage(imagesArr)
+}
+
+function photoClick(event){
+  let cardId = event.target.dataset.id;
+  let thisCard = document.getElementById(cardId);
+  if(event.target.classList.contains('deleteBtn')){
+    deletePhoto(thisCard);
+  }
+  else if(event.target.classList.contains('favoriteBtn')){
+    favoritePhoto(event.target, thisCard);
+  }
 }
 
 
+// ***************** Functionality Add Ons *************** //
+
+// onclick="deletePhoto(${newPhoto.id})"
+function deletePhoto(thisCard){
+  thisCard.remove();
+  var cardToDelete = imagesArr.find(function(idea) {
+    return thisCard.id == idea.id;
+  });
+  let cardIndex = imagesArr.findIndex(function(idea){
+    return thisCard.id == idea.id;
+  })
+  cardToDelete.deleteFromStorage();
+  imagesArr.splice(cardIndex, 1);
+}
+
+function favoritePhoto(favElement, thisCard){
+  console.log("in fav fun");
+  var thisCardArr = imagesArr.find(function(card){
+    return card.id == thisCard.id
+  })
+  if(thisCardArr.favorite === 0){
+    thisCardArr.favorite = 1;
+    favElement.classList.add('isFav');
+    favElement.src = "images/favorite-active.svg";
+  } else if(thisCardArr.favorite === 1) {
+    thisCardArr.favorite = 0;
+    favElement.classList.remove('isFav');
+    favElement.src = "images/favorite.svg";
+  }
+
+
+
+
+  thisCardArr.updateFavorite(favElement);
+
+  // console.log(thisCardArr.favorite);
+
+  // console.log(thisCardArr);
+
+
+  //
+  // console.log(event);
+  // console.log(thisCard);
+  // console.log(thisCard.id);
+}
+
+
+
+
+
+// <article data-name="cookie"></article>
+// var article = document.querySelector('article');
+// article.dataset.name // "cookie"
 
 
 
@@ -79,6 +141,21 @@ function clearStorage(){
   alert('Local Storage Cleared')
   localStorage.clear();
 }
+
+
+
+
+//
+//
+// test.addEventListener("mouseover", function( event ) {
+//     // highlight the mouseover target
+//     event.target.style.color = "orange";
+//
+//     // reset the color after a short delay
+//     setTimeout(function() {
+//       event.target.style.color = "";
+//     }, 500);
+//   }, false);
 
 
 
@@ -121,16 +198,6 @@ function clearStorage(){
 //     document.getElementById('submitBtn').click();
 //   }
 // });
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 //
 //
 //

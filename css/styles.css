@@ -274,19 +274,21 @@ input[type="file"] {
 .photo_feed {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
 }
 
 .photo_card {
   background: #fff;
-  border: #938284 solid 2px;
-  width: 25%;
-  margin: 0 1em;
+  border: #938284 solid 1px;
+  width: 20%;
+  margin: 0 2% 2% 2%;
   display: flex;
   flex-direction: column;
 }
 
 .card_photo_head {
 }
+
 .card_photo_head h2 {
   color:#3e2a35;
   font-size: 1.2em;
