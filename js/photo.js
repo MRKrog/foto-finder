@@ -16,26 +16,10 @@ class Photo {
   }
 
   updateFavorite() {
-    console.log(this);
-    console.log(this.favorite);
-    console.log("Update Content: ");
-    // if(this.favorite == false){
-    //   console.log('in false');
-    //   this.favorite = true;
-    //   favElement.classList.add('isFav');
-    //   favElement.src = "images/favorite-active.svg";
-    // } else if(this.favorite == true){
-    //   console.log('in true');
-    //   this.favorite = false;
-    //   favElement.classList.remove('isFav');
-    //   favElement.src = "images/favorite.svg";
-    // }
     localStorage.setItem(this.id, JSON.stringify(this));
   }
 
-  updateQuality() {
+  updatePhoto() {
     console.log("Update Like: ");
-
-
   }
 }

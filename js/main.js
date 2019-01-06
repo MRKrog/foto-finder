@@ -3,6 +3,9 @@ const create = document.querySelector('#add-btn');
 const titleInput = document.querySelector('.title-input');
 const captionInput = document.querySelector('.caption-input');
 
+const searchInput = document.querySelector('.searchTerm');
+
+
 // var input = document.querySelector('#file-btn');
 
 const fileBtn = document.querySelector('#file-btn');
@@ -19,12 +22,16 @@ var reader = new FileReader();
 window.addEventListener('load', appendPhotos);
 create.addEventListener('click', getPhoto);
 photoGallery.addEventListener('click', photoClick);
+searchInput.addEventListener('keyup', searchPhotos);
+viewBtn.addEventListener('click', viewFavoritesBtn);
 
 
 function appendPhotos() {
+  console.log(imagesArr);
+  console.log(localStorage);
   Object.keys(localStorage).forEach(function(photo) {
     var item = JSON.parse(localStorage.getItem(photo));
-    let newPhoto = new Photo(item.id, item.title, item.caption, item.image);
+    let newPhoto = new Photo(item.id, item.title, item.caption, item.image, item.favorite);
     imagesArr.push(newPhoto);
     addPhoto(newPhoto);
   })
@@ -34,53 +41,69 @@ function getPhoto(){
   // console.log(fileBtn.files[0])
   if (fileBtn.files[0]) {
     reader.readAsDataURL(fileBtn.files[0]);
-    reader.onload = createElement
+    reader.onload = function(event){
+      createElement(event);
+    }
   }
 }
 
 function createElement(event) {
-  // var image = event.target.result;
-  // var title = titleInput.value;
-  // var caption = captionInput.value;
   var newPhoto = new Photo(Date.now(), titleInput.value, captionInput.value, event.target.result);
   imagesArr.push(newPhoto);
   newPhoto.saveToStorage();
   addPhoto(newPhoto);
+
 }
 
 function addPhoto(newPhoto) {
   photoGallery.innerHTML += `<div class="photo_card" id="${newPhoto.id}">
     <section class="card_photo_head card-space">
-      <h2>${newPhoto.title}</h2>
+      <h2 class="photoTitle">${newPhoto.title}</h2>
     </section>
     <section class="card_image_container">
       <img class="card_image" src="${newPhoto.image}" />
     </section>
     <section class="card_photo_copy card-space">
-      <p>${newPhoto.caption}</p>
+      <p class="photoCaption">${newPhoto.caption}</p>
     </section>
     <section class="card_photo_footer card-space">
       <button><img src="images/delete.svg" data-id="${newPhoto.id}" alt="delete" class="deleteBtn" /></button>
       <button><img src="${favoriteArray[newPhoto.favorite]}" data-id="${newPhoto.id}" alt="favorite" class="favoriteBtn" /></button>
     </section>
   </div>`;
+  clearFields();
 }
 
 function photoClick(event){
   let cardId = event.target.dataset.id;
   let thisCard = document.getElementById(cardId);
-  if(event.target.classList.contains('deleteBtn')){
+  var clickedElem = event.target;
+  console.log(event.target);
+  if(clickedElem.classList.contains('deleteBtn')){
     deletePhoto(thisCard);
-  }
-  else if(event.target.classList.contains('favoriteBtn')){
-    favoritePhoto(event.target, thisCard);
+  } else if(clickedElem.classList.contains('favoriteBtn')){
+    favoritePhoto(clickedElem, thisCard);
+  } else if(clickedElem.classList.contains('photoTitle')){
+    updatePhotoText(thisCard);
+  } else if(clickedElem.classList.contains('photoCaption')){
+    updatePhotoText(thisCard);
   }
 }
 
+function clearFields(){
+  titleInput.value = "";
+  captionInput.value = "";
+}
+
+function clearNewPhotos(newPhotos){
+  photoGallery.innerHTML = "";
+  newPhotos.forEach(function(photos){
+    addPhoto(photos)
+  })
+}
 
 // ***************** Functionality Add Ons *************** //
 
-// onclick="deletePhoto(${newPhoto.id})"
 function deletePhoto(thisCard){
   thisCard.remove();
   var cardToDelete = imagesArr.find(function(idea) {
@@ -94,34 +117,41 @@ function deletePhoto(thisCard){
 }
 
 function favoritePhoto(favElement, thisCard){
-  console.log("in fav fun");
   var thisCardArr = imagesArr.find(function(card){
     return card.id == thisCard.id
   })
   if(thisCardArr.favorite === 0){
     thisCardArr.favorite = 1;
     favElement.classList.add('isFav');
-    favElement.src = "images/favorite-active.svg";
+    favElement.src = favoriteArray[1];
   } else if(thisCardArr.favorite === 1) {
     thisCardArr.favorite = 0;
     favElement.classList.remove('isFav');
-    favElement.src = "images/favorite.svg";
+    favElement.src = favoriteArray[0];
   }
+  thisCardArr.updateFavorite();
+}
 
+function viewFavoritesBtn(event){
+  var favoriteArray = imagesArr.filter(function(photos){
+    return photos.favorite === 1;
+  })
+  clearNewPhotos(favoriteArray);
+}
 
+function updatePhotoText(thisCard){
+  console.log('in update photo function ');
+  console.log(thisCard);
+}
 
-
-  thisCardArr.updateFavorite(favElement);
-
-  // console.log(thisCardArr.favorite);
-
-  // console.log(thisCardArr);
-
-
-  //
-  // console.log(event);
-  // console.log(thisCard);
-  // console.log(thisCard.id);
+function searchPhotos(event){
+  let inputSearch = searchInput.value.toLowerCase();
+  var searchArray = imagesArr.filter(function(photo){
+    let titleSearch = photo.title.toLowerCase();
+    let captionSearch = photo.caption.toLowerCase();
+    return titleSearch.includes(inputSearch) || captionSearch.includes(inputSearch);
+  })
+  clearNewPhotos(searchArray);
 }
 
 
