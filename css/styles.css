@@ -53,6 +53,13 @@ p {
 button {
   background: none;
   border:none;
+  padding: 0;
+  pointer-events: all;
+}
+
+button:disabled {
+  background-color: #462d30;
+  pointer-events: none;
 }
 
 img {
@@ -280,10 +287,22 @@ input[type="file"] {
 .photo_card {
   background: #fff;
   border: #938284 solid 1px;
-  width: 20%;
-  margin: 0 2% 2% 2%;
+  width: 22%;
+  margin: 0 2% 4% 2%;
   display: flex;
   flex-direction: column;
+}
+
+.photo_card:first-child {
+  margin: 0 2% 4% 0%;
+}
+
+.photo_card:nth-child(4n){
+  margin: 0 0% 4% 2%;
+}
+
+.photo_card:nth-child(5n){
+  margin: 0 2% 4% 0%;
 }
 
 .card_photo_head {
@@ -294,6 +313,7 @@ input[type="file"] {
   font-size: 1.2em;
   margin:0;
   font-weight: 600;
+  outline:none;
 }
 .card_image_container {}
 
@@ -316,7 +336,7 @@ input[type="file"] {
 }
 
 .card_photo_footer img {
-  width: 30px;
+  width: 25px;
 }
 
 .card-space {

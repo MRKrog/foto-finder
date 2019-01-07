@@ -34,28 +34,26 @@
         <fieldset class="fieldset--container">
           <form>
             <label for="idea-title" class="label-spacing">Title</label>
-            <input type="text" name="title" class="title-input inputs">
+            <input type="text" name="title" class="title-input inputs" required>
           </form>
         </fieldset>
         <fieldset class="fieldset--container">
           <form>
             <label for="idea-body" class="label-spacing">Caption</label>
-            <input type="text" name="caption" class="caption-input inputs">
+            <input type="text" name="caption" class="caption-input inputs" required>
           </form>
         </fieldset>
         <label for="file-btn" class="field_btn choose-btn">Custom Upload</label>
         <!-- <input type="file" name="file" id="file" class="inputfile" data-multiple-caption="{count} files selected" multiple /> -->
-        <input id="file-btn" name="file" accept="image/*,.pdf" type="file"/>
+        <input id="file-btn" name="file" accept="image/*" type="file"/>
         <section class="fieldset--buttons">
-          <button class="field_btn extra-btn" id="view-btn" type="submit">View <span>#</span> Favorite</button>
-          <button class="field_btn extra-btn" id="add-btn" type="submit">Add to Album</button>
+          <button class="field_btn extra-btn" id="view-btn" type="submit">View <span class="view-number">0</span> Favorite</button>
+          <button class="field_btn extra-btn" id="add-btn" type="submit" disabled="true">Add to Album</button>
         </section>
       </article>
     </main><!-- /End Top Container -->
     <main class="photo_container">
-      <article class="photo_feed">
-
-      </article>
+      <article class="photo_feed"></article>
     </main><!-- /End Photo Container -->
     <footer class="footer--container">
       <button style="width:20%; margin:1em;" class="field_btn extra-btn" id="clear-btn" type="submit">Clear</button>

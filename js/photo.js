@@ -20,6 +20,6 @@ class Photo {
   }
 
   updatePhoto() {
-    console.log("Update Like: ");
+    localStorage.setItem(this.id, JSON.stringify(this));
   }
 }

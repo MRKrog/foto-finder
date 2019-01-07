@@ -2,20 +2,22 @@
 const create = document.querySelector('#add-btn');
 const titleInput = document.querySelector('.title-input');
 const captionInput = document.querySelector('.caption-input');
-
 const searchInput = document.querySelector('.searchTerm');
-
-
-// var input = document.querySelector('#file-btn');
 
 const fileBtn = document.querySelector('#file-btn');
 const viewBtn = document.querySelector('#view-btn');
 const addBtn = document.querySelector('#add-btn');
 
+var viewNum = document.querySelector('.view-number');
+var currentViewNum = 0;
+
 const photoGallery = document.querySelector('.photo_feed');
+const photoCard = document.querySelectorAll('.photo_card');
+
+const checkInputsSection = document.querySelector('.fieldset--container');
 
 const imagesArr = [];
-const favoriteArray = ['images/favorite.svg','images/favorite-active.svg']
+const favoriteArray = ['images/favorite.svg','images/favorite-active.svg'];
 
 var reader = new FileReader();
 
@@ -23,22 +25,40 @@ window.addEventListener('load', appendPhotos);
 create.addEventListener('click', getPhoto);
 photoGallery.addEventListener('click', photoClick);
 searchInput.addEventListener('keyup', searchPhotos);
-viewBtn.addEventListener('click', viewFavoritesBtn);
+viewBtn.addEventListener('click', favoritesBtn);
+
+checkInputsSection.addEventListener('keyup', checkInputs);
+
+
 
 
 function appendPhotos() {
-  console.log(imagesArr);
-  console.log(localStorage);
   Object.keys(localStorage).forEach(function(photo) {
     var item = JSON.parse(localStorage.getItem(photo));
     let newPhoto = new Photo(item.id, item.title, item.caption, item.image, item.favorite);
     imagesArr.push(newPhoto);
     addPhoto(newPhoto);
+    // ************ have counter pass into add photo
+    currentViewNum += item.favorite;
   })
+  viewNum.innerHTML = currentViewNum;
+  // checkInputs();
 }
 
+// *********** Phase Three *********** //
+// If there are no photos in the album yet, then there should be an indication to the user to add photos, displayed in the empty photo section.
+// The file selector should only allow image file types
+//
+
+function checkInputs(){
+  var allInputsChecks = titleInput.value && captionInput.value && fileBtn.files[0];
+  var addButtonState = allInputsChecks ? addBtn.disabled = false : addBtn.disabled = true;
+}
+
+
+
+
 function getPhoto(){
-  // console.log(fileBtn.files[0])
   if (fileBtn.files[0]) {
     reader.readAsDataURL(fileBtn.files[0]);
     reader.onload = function(event){
@@ -52,41 +72,48 @@ function createElement(event) {
   imagesArr.push(newPhoto);
   newPhoto.saveToStorage();
   addPhoto(newPhoto);
-
+  clearFields();
 }
 
 function addPhoto(newPhoto) {
+  // ************ condition for creating more or less than 10
   photoGallery.innerHTML += `<div class="photo_card" id="${newPhoto.id}">
     <section class="card_photo_head card-space">
-      <h2 class="photoTitle">${newPhoto.title}</h2>
+      <h2 class="photoTitle" contenteditable="true">${newPhoto.title}</h2>
     </section>
     <section class="card_image_container">
       <img class="card_image" src="${newPhoto.image}" />
     </section>
     <section class="card_photo_copy card-space">
-      <p class="photoCaption">${newPhoto.caption}</p>
+      <p class="photoCaption" contenteditable="true">${newPhoto.caption}</p>
     </section>
     <section class="card_photo_footer card-space">
       <button><img src="images/delete.svg" data-id="${newPhoto.id}" alt="delete" class="deleteBtn" /></button>
       <button><img src="${favoriteArray[newPhoto.favorite]}" data-id="${newPhoto.id}" alt="favorite" class="favoriteBtn" /></button>
     </section>
   </div>`;
-  clearFields();
+  // checkInputs();
 }
 
 function photoClick(event){
   let cardId = event.target.dataset.id;
   let thisCard = document.getElementById(cardId);
-  var clickedElem = event.target;
-  console.log(event.target);
+  let clickedElem = event.target;
+  // console.log(clickedElem);
+
+  // ************ function to check events targetChecker()
+
   if(clickedElem.classList.contains('deleteBtn')){
     deletePhoto(thisCard);
   } else if(clickedElem.classList.contains('favoriteBtn')){
-    favoritePhoto(clickedElem, thisCard);
+    changeFavorite(clickedElem, thisCard);
   } else if(clickedElem.classList.contains('photoTitle')){
-    updatePhotoText(thisCard);
+    updatePhotoText(clickedElem);
   } else if(clickedElem.classList.contains('photoCaption')){
-    updatePhotoText(thisCard);
+    updatePhotoText(clickedElem);
+  } else if(clickedElem.classList.contains('card_image')) {
+    console.log("clicked image");
+    updatePhotoText(clickedElem);
   }
 }
 
@@ -95,53 +122,81 @@ function clearFields(){
   captionInput.value = "";
 }
 
-function clearNewPhotos(newPhotos){
+function updatePhotoField(newPhotos){
   photoGallery.innerHTML = "";
   newPhotos.forEach(function(photos){
     addPhoto(photos)
   })
 }
 
+
 // ***************** Functionality Add Ons *************** //
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function deletePhoto(thisCard){
   thisCard.remove();
-  var cardToDelete = imagesArr.find(function(idea) {
-    return thisCard.id == idea.id;
+  var cardToDelete = imagesArr.find(function(photo) {
+    return thisCard.id == photo.id;
   });
-  let cardIndex = imagesArr.findIndex(function(idea){
-    return thisCard.id == idea.id;
+  let cardIndex = imagesArr.findIndex(function(photo){
+    return thisCard.id == photo.id;
   })
   cardToDelete.deleteFromStorage();
   imagesArr.splice(cardIndex, 1);
 }
 
-function favoritePhoto(favElement, thisCard){
+function changeFavorite(favElement, thisCard){
   var thisCardArr = imagesArr.find(function(card){
     return card.id == thisCard.id
   })
   if(thisCardArr.favorite === 0){
     thisCardArr.favorite = 1;
-    favElement.classList.add('isFav');
     favElement.src = favoriteArray[1];
+    number = 1;
   } else if(thisCardArr.favorite === 1) {
     thisCardArr.favorite = 0;
-    favElement.classList.remove('isFav');
     favElement.src = favoriteArray[0];
+    number = -1;
   }
   thisCardArr.updateFavorite();
+  updateViewNumber(number);
 }
 
-function viewFavoritesBtn(event){
+function favoritesBtn(event){
+  var originalArray = imagesArr;
   var favoriteArray = imagesArr.filter(function(photos){
     return photos.favorite === 1;
   })
-  clearNewPhotos(favoriteArray);
+  updatePhotoField(favoriteArray);
+  changeViewText(originalArray);
 }
 
-function updatePhotoText(thisCard){
-  console.log('in update photo function ');
-  console.log(thisCard);
+function updateViewNumber(number){
+  currentViewNum += number;
+  viewBtn.childNodes[1].innerHTML = currentViewNum;
+}
+
+function changeViewText(originalArray){
+  if(viewBtn.innerHTML === "View All Photos"){
+    viewBtn.innerHTML = `View <span class="view-number">${currentViewNum}</span> Favorite`;
+    updatePhotoField(originalArray);
+  } else {
+    viewBtn.innerHTML = "View All Photos";
+  }
 }
 
 function searchPhotos(event){
@@ -151,16 +206,88 @@ function searchPhotos(event){
     let captionSearch = photo.caption.toLowerCase();
     return titleSearch.includes(inputSearch) || captionSearch.includes(inputSearch);
   })
-  clearNewPhotos(searchArray);
+  updatePhotoField(searchArray);
 }
 
 
 
 
 
-// <article data-name="cookie"></article>
-// var article = document.querySelector('article');
-// article.dataset.name // "cookie"
+
+//********* Recent Photo Show More or less ********* //
+// Finally, let’s let our user be able to view only their favorites.
+// The user should only see their favorites when they click on the View Favorites button. (consequently, the text on the button should then say View All Photos)
+// Clicking on the View All Photos button, the user should be able to see all of their photo cards.
+// When viewing favorites, search field should only search through the favorited photos.
+// Do not need to persist changes in between sessions.
+
+
+
+// **** Extensions ******* //
+// When the user clicks on the image, the user should be able to update the photo using the updatePhoto method.
+// Include at least 3 different animations. Example: one for when a card gets created/deleted.
+
+
+
+
+
+// Bonus: If the user clicks on the image, the user should be able to update the photo using the updatePhoto method.
+function updatePhotoText(clickedElement){
+  var thisCard = clickedElement.closest(".photo_card");
+  let thisIndex = imagesArr.findIndex(function(index){
+    return index.id == thisCard.id;
+  })
+  var thisArray = imagesArr[thisIndex];
+  // var value = condition ? valueWhenTrue : valueWhenFalse;
+  clickedElement.addEventListener('blur', function(event) {
+    updateContent(thisArray, clickedElement)
+  }, true);
+
+  clickedElement.addEventListener('keydown', function(event){
+    if (event.keyCode === 13) {
+      updateContent(thisArray, clickedElement);
+      event.preventDefault();
+    }
+  });
+}
+
+function updateContent(thisArray, clickedElement){
+  console.log(clickedElement);
+  console.log("^^^^^^^^^^^^ clicked element");
+  if(clickedElement.classList.contains('photoTitle')){
+    thisArray.title = clickedElement.innerHTML;
+    console.log("in title");
+  } else if(clickedElement.classList.contains('photoCaption')){
+    thisArray.caption = clickedElement.innerHTML;
+    console.log("in caption");
+  } else if(clickedElement.classList.contains('card_image')) {
+
+  }
+  thisArray.updatePhoto();
+}
+
+// function eventUpdate(thisArray, clickedElement){
+//
+//   // pressedEnter(thisArray, clickedElement)
+//   clickedOut(thisArray, clickedElement, thisClass)
+// }
+
+//
+// function clickedOut(thisArray, clickedElement, thisClass){
+//   clickedElement.addEventListener('blur', function(event) {
+//     console.log("in blur");
+//     thisClass = clickedElement.innerHTML;
+//     console.log(thisClass);
+//     // thisArray.caption = clickedElem.innerHTML;
+//     updateContent(thisArray)
+//   }, true);
+// }
+
+
+
+
+
+
 
 
 
