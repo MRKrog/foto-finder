@@ -20,9 +20,6 @@ class Photo {
   }
 
   updatePhoto() {
-    // do the save this.title and this.caption Here
-    // Also do the save photos here
     localStorage.setItem(this.id, JSON.stringify(this));
-
   }
 }

@@ -4,6 +4,7 @@ const titleInput = document.querySelector('.title-input');
 const captionInput = document.querySelector('.caption-input');
 const searchInput = document.querySelector('.searchTerm');
 const fileBtn = document.querySelector('#file-btn');
+const chooseBtn = document.querySelector('.custom-btn');
 const viewBtn = document.querySelector('#view-btn');
 const addBtn = document.querySelector('#add-btn');
 const photoContainer = document.querySelector('.photo_container');
@@ -12,12 +13,12 @@ const photoCard = document.querySelectorAll('.photo_card');
 const moreBtn = document.querySelector('#more-btn');
 const inputsContainer = document.querySelector('.input_container');
 
-
 var viewNum = document.querySelector('.view-number');
 var alertText = document.querySelector('.photo-alert');
 
 var currentViewNum = 0;
 var imagesArr = [];
+var tempArr = [];
 var reader = new FileReader();
 var localStorageLength = Object.keys(localStorage);
 const favoriteArray = ['images/favorite.svg','images/favorite-active.svg'];
@@ -29,32 +30,29 @@ searchInput.addEventListener('keyup', searchPhotos);
 viewBtn.addEventListener('click', favoritesBtn);
 inputsContainer.addEventListener('input', checkInputs);
 moreBtn.addEventListener('click', showRecent);
-// fileBtn.addEventListener('change', buttonDisable);
+fileBtn.addEventListener('change', changeFileText);
 
-
-
-//****************** START FUNCTIONS ****************** //
 function appendPhotos() {
+  imagerArray();
   checkPhotos();
   checkPhotoField();
 }
 
-function checkPhotos(){
-  (localStorageLength.length > 10) ? initializeTen() : initializeAll();
-}
-
-function checkFavorite(){
-  viewNum.innerHTML = currentViewNum;
+function imagerArray(){
+  localStorageLength.forEach(function(photo) {
+    var item = JSON.parse(localStorage.getItem(photo));
+    let newPhoto = new Photo(item.id, item.title, item.caption, item.image, item.favorite);
+    imagesArr.push(newPhoto);
+    currentViewNum += item.favorite;
+  })
 }
 
 function initializeAll(){
   clearPhotoField();
-  localStorageLength.forEach(function(photo, index) {
-    var item = JSON.parse(localStorage.getItem(photo));
-    let newPhoto = new Photo(item.id, item.title, item.caption, item.image, item.favorite);
-    imagesArr.push(newPhoto);
-    addPhoto(newPhoto);
-    currentViewNum += item.favorite;
+  imagesArr.forEach(function(photo) {
+    tempArr.push(photo);
+    addPhoto(photo);
+    currentViewNum += photo.favorite;
   })
   checkFavorite();
   checkMoreButton();
@@ -62,44 +60,16 @@ function initializeAll(){
 
 function initializeTen(){
   clearPhotoField();
-  localStorageLength.forEach(function(photo, index) {
+  imagesArr.forEach(function(photo, index) {
     if(index < 10){
-      var item = JSON.parse(localStorage.getItem(photo));
-      let newPhoto = new Photo(item.id, item.title, item.caption, item.image, item.favorite);
-      imagesArr.push(newPhoto);
-      addPhoto(newPhoto);
-      currentViewNum += item.favorite;
+      tempArr.push(photo);
+      addPhoto(photo);
+      currentViewNum += photo.favorite;
     }
   })
   checkFavorite();
   checkMoreButton();
 }
-
-
-function clearPhotoField(){
-  currentViewNum = 0;
-  imagesArr = [];
-  photoGallery.innerHTML = "";
-}
-
-function checkMoreButton(){
-  (photoGallery.childElementCount < 10) ? moreBtn.style.display = "none" :  moreBtn.style.display = "block"
-}
-
-function showRecent(){
-  (moreBtn.innerHTML === "Show More...") ? showLessAction() : moreLessAction();
-}
-
-function showLessAction(){
-  initializeAll();
-  moreBtn.innerHTML = "Show Less...";
-}
-
-function moreLessAction(){
-  initializeTen();
-  moreBtn.innerHTML = "Show More..."
-}
-
 
 function getPhoto(){
   if (fileBtn.files[0]) {
@@ -108,10 +78,6 @@ function getPhoto(){
       createElement(event);
     }
   }
-}
-
-function buttonDisable(){
-  fileBtn.value = "";
 }
 
 function createElement(event) {
@@ -143,13 +109,52 @@ function addPhoto(newPhoto) {
   checkPhotoField();
 }
 
+function checkPhotos(){
+  (localStorageLength.length > 10) ? initializeTen() : initializeAll();
+}
+
+function checkFavorite(){
+  viewNum.innerHTML = currentViewNum;
+}
+
+function clearPhotoField(){
+  currentViewNum = 0;
+  tempArr = [];
+  photoGallery.innerHTML = "";
+}
+
+function checkMoreButton(){
+  (photoGallery.childElementCount < 10) ? moreBtn.style.display = "none" :  moreBtn.style.display = "block"
+}
+
+function changeFileText(){
+  let fileText = fileBtn.files[0].name;
+  chooseBtn.innerHTML = fileText;
+}
+
+function showRecent(){
+  (moreBtn.innerHTML === "Show More...") ? showLessAction() : moreLessAction();
+}
+
+function showLessAction(){
+  initializeAll();
+  moreBtn.innerHTML = "Show Less...";
+}
+
+function moreLessAction(){
+  initializeTen();
+  moreBtn.innerHTML = "Show More..."
+}
+
+function buttonDisable(){
+  chooseBtn.innerHTML = "Choose File";
+  fileBtn.value = "";
+}
+
 function photoClick(event){
   let cardId = event.target.dataset.id;
   let thisCard = document.getElementById(cardId);
   let clickedElem = event.target;
-
-  // ************ function to check events targetChecker()
-
   if(clickedElem.classList.contains('deleteBtn')){
     deletePhoto(thisCard);
   } else if(clickedElem.classList.contains('favoriteBtn')){
@@ -158,10 +163,14 @@ function photoClick(event){
     updatePhotoText(clickedElem);
   } else if(clickedElem.classList.contains('photoCaption')){
     updatePhotoText(clickedElem);
-  } else if(clickedElem.classList.contains('card_image')) {
-    console.log("clicked image");
-    updatePhotoText(clickedElem);
+  } else if(clickedElem.classList.contains('card_image')){
+    updateImageSource(clickedElem);
   }
+}
+
+function updateImageSource(clickedElem){
+  console.log(clickedElem);
+
 }
 
 function clearFields(){
@@ -194,7 +203,6 @@ function checkPhotoField(){
   }
 }
 
-// ***************** Functionality Add Ons *************** //
 function deletePhoto(thisCard){
   var cardToDelete = imagesArr.find(function(photo) {
     return thisCard.id == photo.id;
@@ -214,25 +222,6 @@ function removeCard(thisCard){
     thisCard.remove();
   }, 1000);
 }
-
-//
-// function changeFavorite(favElement, thisCard){
-//   var thisCardArr = imagesArr.find(function(card){
-//     return card.id == thisCard.id
-//   })
-//   if(thisCardArr.favorite === 0){
-//     thisCardArr.favorite = 1;
-//     favElement.src = favoriteArray[1];
-//     number = 1;
-//   } else if(thisCardArr.favorite === 1) {
-//     thisCardArr.favorite = 0;
-//     favElement.src = favoriteArray[0];
-//     number = -1;
-//   }
-//   thisCardArr.updateFavorite();
-//   updateViewNumber(number);
-// }
-
 
 function changeFavorite(favElement, thisCard){
   var thisCardArr = imagesArr.find(function(card){
@@ -313,9 +302,3 @@ function updateContent(thisArray, clickedElement){
   }
   thisArray.updatePhoto();
 }
-
-// Bonus: If the user clicks on the image, the user should be able to update the photo using the updatePhoto method.
-
-// **** Extensions ******* //
-// When the user clicks on the image, the user should be able to update the photo using the updatePhoto method.
-// Include at least 3 different animations. Example: one for when a card gets created/deleted.
