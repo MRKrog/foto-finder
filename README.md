@@ -19,4 +19,4 @@ This project was build with the following
 ![Static Comp From Turing](images/fotofinder-assignment.png)
 
 ### My Assignment Screen Grab
-![Screen Grab of My Assignment](images/fotofinder-user.png)
+![Screen Grab of My Assignment](images/fotofinder-mydoc.png)

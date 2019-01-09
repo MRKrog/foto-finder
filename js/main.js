@@ -283,7 +283,7 @@ function updatePhotoText(clickedElement){
     return index.id == thisCard.id;
   })
   var thisArray = imagesArr[thisIndex];
-  clickedElement.addEventListener('blur', function(event) {
+  clickedElement.addEventListener('focusout', function(event) {
     updateContent(thisArray, clickedElement)
   }, true);
   clickedElement.addEventListener('keydown', function(event){
