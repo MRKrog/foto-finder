@@ -34,17 +34,16 @@
         <fieldset class="fieldset--container">
           <form>
             <label for="idea-title" class="label-spacing">Title</label>
-            <input type="text" name="title" class="title-input inputs" required>
+            <input type="text" name="title" class="title-input inputs">
           </form>
         </fieldset>
         <fieldset class="fieldset--container">
           <form>
             <label for="idea-body" class="label-spacing">Caption</label>
-            <input type="text" name="caption" class="caption-input inputs" required>
+            <input type="text" name="caption" class="caption-input inputs">
           </form>
         </fieldset>
-        <label for="file-btn" class="field_btn choose-btn">Custom Upload</label>
-        <!-- <input type="file" name="file" id="file" class="inputfile" data-multiple-caption="{count} files selected" multiple /> -->
+        <label for="file-btn" class="field_btn choose-btn custom-btn">Choose File</label>
         <input id="file-btn" name="file" accept="image/*" type="file"/>
         <section class="fieldset--buttons">
           <button class="field_btn extra-btn" id="view-btn" type="submit">View <span class="view-number">0</span> Favorite</button>
@@ -53,10 +52,11 @@
       </article>
     </main><!-- /End Top Container -->
     <main class="photo_container">
+      <p class="photo-alert"></p>
       <article class="photo_feed"></article>
     </main><!-- /End Photo Container -->
     <footer class="footer--container">
-      <button style="width:20%; margin:1em;" class="field_btn extra-btn" id="clear-btn" type="submit">Clear</button>
+      <button class="field_btn extra-btn" id="more-btn">Show More...</button>
     </footer><!-- /End Footer -->
     <!-- JAVASCRIPT -->
     <script type="text/javascript" src="js/photo.js"></script>
