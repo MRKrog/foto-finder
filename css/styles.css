@@ -146,7 +146,7 @@ input {
    display: flex;
    flex-direction: column;
    margin: 0 auto;
-   max-width: 860px;
+   max-width: 600px;
    padding: 2em;
 }
 .fieldset--container {
